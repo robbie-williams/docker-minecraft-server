@@ -23,6 +23,7 @@ on:
 
 env:
   IMAGE_TO_TEST: itzg/minecraft-server:test-${{ github.repository_owner }}-${{ github.run_id }}
+  DOCKER_IMAGE: itzg/minecraft-server
 
 jobs:
   build:
@@ -34,7 +35,6 @@ jobs:
     - name: Prepare
       id: prep
       run: |
-        DOCKER_IMAGE=itzg/minecraft-server
         VERSION=edge
         if [[ $GITHUB_REF == refs/tags/* ]]; then
           VERSION=${GITHUB_REF#refs/tags/}
@@ -45,7 +45,7 @@ jobs:
             VERSION=latest
           fi
         fi
-        TAGS="${DOCKER_IMAGE}:${VERSION//\//-}"
+        TAGS="${{env.DOCKER_IMAGE}}:${VERSION//\//-}"
         echo ::set-output name=tags::${TAGS}
         echo ::set-output name=version::${VERSION//\//-}
 
@@ -84,7 +84,7 @@ jobs:
         # Server address of Docker registry. If not set then will default to Docker Hub
         registry: gcr.io
         # Docker repository to tag the image with
-        repository: ${{ secrets.GCLOUD_PROJECT_ID }}/${{DOCKER_IMAGE}}
+        repository: ${{ secrets.GCLOUD_PROJECT_ID }}/${{env.DOCKER_IMAGE}}
         context: .
         file: ./Dockerfile
         # ensure latest base image is used
