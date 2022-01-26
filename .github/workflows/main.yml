@@ -3,17 +3,23 @@ name: Build and Publish
 on:
   push:
     branches:
-      - java8
-      - openj9
-      - openj9-11
-      - adopt11
-      - test/alpine/*
+      - master
+      - java8-multiarch
+      - java8-openj9
+      - java11*
+      - java16*
+      - java17*
+      - test/**
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+-java8"
-      - "[0-9]+.[0-9]+.[0-9]+-openj9"
-      - "[0-9]+.[0-9]+.[0-9]+-openj9-11"
-      - "[0-9]+.[0-9]+.[0-9]+-openj9-nightly"
-      - "[0-9]+.[0-9]+.[0-9]+-adopt11"
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-java8-multiarch"
+      - "[0-9]+.[0-9]+.[0-9]+-java8-openj9"
+      - "[0-9]+.[0-9]+.[0-9]+-java11*"
+      - "[0-9]+.[0-9]+.[0-9]+-java16*"
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
+      - "examples/**"
 
 env:
   IMAGE_TO_TEST: itzg/minecraft-server:test-${{ github.repository_owner }}-${{ github.run_id }}
