@@ -43,7 +43,7 @@ jobs:
     
     ## BUILD AND PUSH TO GCP
     - name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v0.4.0'
+      uses: 'google-github-actions/auth@v0'
       with:
         credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
