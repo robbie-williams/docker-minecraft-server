@@ -60,11 +60,6 @@ jobs:
         gcloud auth configure-docker
         docker build -t gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }} .
         docker push gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
-
-    # - name: Build and Push Container
-    #   run: |-
-    #     docker build -t gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }} .
-    #     docker push gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
       
     - name: Show Output
       run: echo ${{ steps.deploy.outputs.url }}
