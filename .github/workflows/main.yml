@@ -65,8 +65,8 @@ jobs:
         # ensure latest base image is used
         pull: true
         # publish
+        load: true
         push: false
-        # tags determined by prep step
         tags: gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
