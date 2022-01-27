@@ -25,9 +25,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2.4.0
 
-    - name: print some stuff
-      run: echo ${{env.GCLOUD_PROJECT_ID}}
-
     - name: Prepare
       id: prep
       run: |
@@ -44,7 +41,6 @@ jobs:
         TAGS="${{env.DOCKER_IMAGE}}:${VERSION//\//-}"
         echo ::set-output name=tags::${TAGS}
         echo ::set-output name=version::${VERSION//\//-}
-
     
     ## BUILD AND PUSH TO GCP
     - name: Setup Cloud SDK
@@ -80,6 +76,8 @@ jobs:
           org.opencontainers.image.source=https://github.com/itzg/docker-minecraft-server
           org.opencontainers.image.revision=${{ github.sha }}
 
+    - name: what images are there then
+      run: docker image ls
 
     - name: Push Container
       run: |-
