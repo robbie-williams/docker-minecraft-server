@@ -48,9 +48,6 @@ jobs:
     
     ## BUILD AND PUSH TO GCP
     - name: Setup Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0
-
-    - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.2.0
       with:
         project_id:  ${{ env.GCLOUD_PROJECT_ID }}
@@ -60,9 +57,11 @@ jobs:
     - name: Authorize Docker push
       run: gcloud auth configure-docker
 
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
     - name: Authorize Docker and Build and Push Container
       run: |-
-        gcloud auth configure-docker
         docker build -t gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }} .
         docker push gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
       
