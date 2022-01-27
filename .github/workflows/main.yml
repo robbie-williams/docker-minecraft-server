@@ -13,7 +13,6 @@ on:
 
 env:
   DOCKER_IMAGE: minecraft-server
-  PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
   REGION: us-central1
   GCLOUD_PROJECT_ID: docker-minecraft-server
   GCLOUD_PROJECT_NAME: docker-minecraft-server
