@@ -62,9 +62,7 @@ jobs:
       with:
         context: .
         file: ./Dockerfile
-        # ensure latest base image is used
         pull: true
-        # publish
         load: true
         push: false
         tags: gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
