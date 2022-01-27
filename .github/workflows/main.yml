@@ -43,17 +43,16 @@ jobs:
         echo ::set-output name=version::${VERSION//\//-}
     
     ## BUILD AND PUSH TO GCP
-    - id: 'auth'
+    - id: auth
       uses: google-github-actions/auth@v0
       with:
-        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v0
 
     - name: 'Use gcloud CLI'
       run: 'gcloud info'
-
 
     - name: Authorize Docker push
       run: gcloud auth configure-docker
