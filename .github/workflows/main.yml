@@ -81,10 +81,9 @@ jobs:
           org.opencontainers.image.revision=${{ github.sha }}
 
 
-    # - name: Authorize Docker and Build and Push Container
-    #   run: |-
-    #     docker build -t gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }} .
-    #     docker push gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
+    - name: Push Container
+      run: |-
+        docker push gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
       
     - name: Show Output
       run: echo ${{ steps.deploy.outputs.url }}
