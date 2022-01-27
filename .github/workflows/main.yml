@@ -24,6 +24,8 @@ on:
 env:
   IMAGE_TO_TEST: itzg/minecraft-server:test-${{ github.repository_owner }}-${{ github.run_id }}
   DOCKER_IMAGE: itzg/minecraft-server
+  PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+  REGION: us-central1
 
 jobs:
   build:
@@ -73,33 +75,48 @@ jobs:
       env:
         MINECRAFT_VERSION: 1.12.2
 
-    - name: Build and push
-      id: docker_build
-      uses: docker/build-push-action@v2.8.0
+    # - name: Build and push
+    #   id: docker_build
+    #   uses: docker/build-push-action@v2.8.0
+    #   with:
+    #     context: .
+    #     file: ./Dockerfile
+    #     # ensure latest base image is used
+    #     pull: true
+    #     # publish
+    #     push: true
+    #     # tags determined by prep step
+    #     tags: ${{ steps.prep.outputs.tags }}
+    #     cache-from: type=gha
+    #     cache-to: type=gha,mode=max
+    #     labels: |
+    #       org.opencontainers.image.documentation=https://github.com/itzg/docker-minecraft-server
+    #       org.opencontainers.image.version=${{ steps.prep.outputs.version }}
+    #       org.opencontainers.image.source=https://github.com/itzg/docker-minecraft-server
+    #       org.opencontainers.image.revision=${{ github.sha }}
+    
+    ## BUILD AND PUSH TO GCP
+    - name: Setup Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0
       with:
-        # Username used to log in to a Docker registry. If not set then no login will occur
-        username: ${{ secrets.GCLOUD_CLIENT_EMAIL}}
-        # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
-        password: ${{ secrets.GCLOUD_SERVICE_KEY }}
-        # Server address of Docker registry. If not set then will default to Docker Hub
-        registry: gcr.io
-        # Docker repository to tag the image with
-        repository: ${{ secrets.GCLOUD_PROJECT_ID }}/${{env.DOCKER_IMAGE}}
-        context: .
-        file: ./Dockerfile
-        # ensure latest base image is used
-        pull: true
-        # publish
-        push: true
-        # tags determined by prep step
-        tags: ${{ steps.prep.outputs.tags }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        labels: |
-          org.opencontainers.image.documentation=https://github.com/itzg/docker-minecraft-server
-          org.opencontainers.image.version=${{ steps.prep.outputs.version }}
-          org.opencontainers.image.source=https://github.com/itzg/docker-minecraft-server
-          org.opencontainers.image.revision=${{ github.sha }}
+        project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true  # Set to true to authenticate the Cloud Run action
 
-    - name: Image digest
-      run: echo ${{ steps.docker_build.outputs.digest }}
+    - name: Authorize Docker push
+      run: gcloud auth configure-docker
+
+    - name: Build and Push Container
+      run: |-
+        docker build -t gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }} ${{env.DOCKER_IMAGE}}
+        docker push gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
+    # - name: Deploy to Cloud Run
+    #   id: deploy
+    #   uses: google-github-actions/deploy-cloudrun@v0
+    #   with:
+    #     service: ${{ secrets.GCLOUD_PROJECT_NAME }}
+    #     image: gcr.io/${{ secrets.GCLOUD_PROJECT_ID  }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
+    #     region: ${{ env.REGION }}
+
+    - name: Show Output
+      run: echo ${{ steps.deploy.outputs.url }}
