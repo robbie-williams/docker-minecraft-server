@@ -15,6 +15,8 @@ env:
   DOCKER_IMAGE: minecraft-server
   PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
   REGION: us-central1
+  GCLOUD_PROJECT_ID: docker-minecraft-server
+  GCLOUD_PROJECT_NAME: docker-minecraft-server
 
 jobs:
   build-and-push:
@@ -24,7 +26,7 @@ jobs:
     - uses: actions/checkout@v2.4.0
 
     - name: print some stuff
-      run: echo ${{secrets.GCLOUD_PROJECT_ID}}
+      run: echo ${{env.GCLOUD_PROJECT_ID}}
 
     - name: Prepare
       id: prep
@@ -51,7 +53,7 @@ jobs:
     - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.2.0
       with:
-        project_id:  ${{ secrets.GCLOUD_PROJECT_ID }}
+        project_id:  ${{ env.GCLOUD_PROJECT_ID }}
         service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
         export_default_credentials: true  # Set to true to authenticate the Cloud Run action
 
@@ -61,8 +63,8 @@ jobs:
     - name: Authorize Docker and Build and Push Container
       run: |-
         gcloud auth configure-docker
-        docker build -t gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }} .
-        docker push gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
+        docker build -t gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }} .
+        docker push gcr.io/${{ env.GCLOUD_PROJECT_ID }}/${{ env.GCLOUD_PROJECT_NAME }}:${{  github.sha }}
       
     - name: Show Output
       run: echo ${{ steps.deploy.outputs.url }}
