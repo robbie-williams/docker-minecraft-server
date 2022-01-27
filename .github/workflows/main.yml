@@ -23,6 +23,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2.4.0
 
+    - name: print some stuff
+      run: echo ${{ secrets.GCLOUD_PROJECT_ID }}
+
     - name: Prepare
       id: prep
       run: |
@@ -48,7 +51,7 @@ jobs:
     - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.2.0
       with:
-        project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+        project_id:  ${{ secrets.GCLOUD_PROJECT_ID }}
         service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
         export_default_credentials: true  # Set to true to authenticate the Cloud Run action
 
