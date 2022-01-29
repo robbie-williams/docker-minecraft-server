@@ -80,6 +80,7 @@ jobs:
       run: docker image ls
 
     - name: Push Container
+      env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: minecraft-server-docker
         IMAGE_TAG: ${{ github.sha }}-prod
