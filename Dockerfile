@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FROM eclipse-temurin:17-jdk
 
 LABEL org.opencontainers.image.authors="Geoff Bourne <itzgeoff@gmail.com>"
@@ -29,6 +30,21 @@ RUN apt-get update \
 
 RUN addgroup --gid 1000 minecraft \
   && adduser --system --shell /bin/false --uid 1000 --ingroup minecraft --home /data minecraft
+=======
+# syntax = docker/dockerfile:1.3
+
+ARG BASE_IMAGE=eclipse-temurin:17-jdk
+FROM ${BASE_IMAGE}
+
+# CI system should set this to a hash or git revision of the build directory and it's contents to
+# ensure consistent cache updates.
+ARG BUILD_FILES_REV=1
+RUN --mount=target=/build,source=build \
+    REV=${BUILD_FILES_REV} /build/run.sh install-packages
+
+RUN --mount=target=/build,source=build \
+    REV=${BUILD_FILES_REV} /build/run.sh setup-user
+>>>>>>> c50c9988fc90285a0c2c5739a6eeb8a0f494ca2a
 
 COPY --chmod=644 files/sudoers* /etc/sudoers.d
 
@@ -64,7 +80,7 @@ RUN easy-add --var os=${TARGETOS} --var arch=${TARGETARCH}${TARGETVARIANT} \
   --var version=0.1.1 --var app=maven-metadata-release --file {{.app}} \
   --from https://github.com/itzg/{{.app}}/releases/download/{{.version}}/{{.app}}_{{.version}}_{{.os}}_{{.arch}}.tar.gz
 
-ARG MC_HELPER_VERSION=1.16.2
+ARG MC_HELPER_VERSION=1.16.6
 ARG MC_HELPER_BASE_URL=https://github.com/itzg/mc-image-helper/releases/download/v${MC_HELPER_VERSION}
 RUN curl -fsSL ${MC_HELPER_BASE_URL}/mc-image-helper-${MC_HELPER_VERSION}.tgz \
   | tar -C /usr/share -zxf - \

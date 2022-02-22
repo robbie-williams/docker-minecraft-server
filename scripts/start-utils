@@ -40,6 +40,10 @@ function getFilenameFromUrl() {
 }
 
 function isTrue() {
+  local oldState
+  oldState=$(shopt -po xtrace)
+  shopt -u -o xtrace
+
   local value=${1,,}
 
   result=
@@ -53,6 +57,7 @@ function isTrue() {
     ;;
   esac
 
+  eval "$oldState"
   return ${result}
 }
 
@@ -82,7 +87,18 @@ function logn() {
 }
 
 function log() {
-  echo "[init] $*"
+  local oldState
+  # The  return  status  when listing options is zero if all optnames are enabled, non- zero otherwise.
+  oldState=$(shopt -po xtrace || true)
+  shopt -u -o xtrace
+
+  if isDebugging || isTrue "${LOG_TIMESTAMP:-false}"; then
+    ts=" $(date --rfc-3339=seconds)"
+  else
+    ts=
+  fi
+  echo "[init]${ts} $*"
+  eval "$oldState"
 }
 
 function logAutopause() {
@@ -174,20 +190,32 @@ function get() {
 
 function isFamily() {
   for f in "${@}"; do
-    if [[ $FAMILY == "$f" ]]; then
+    if [[ ${FAMILY^^} == "${f^^}" ]]; then
       return 0
     fi
   done
-
   return 1
 }
+
 function isType() {
   for t in "${@}"; do
+    # shellcheck disable=SC2153
     if [[ $TYPE == "$t" ]]; then
       return 0
     fi
   done
   return 1
+}
+
+function evaluateJavaCompatibilityForForge() {
+  javaRelease=$(mc-image-helper java-release)
+  if versionLessThan 1.18 && (( javaRelease > 8 )); then
+    log "**********************************************************************"
+    log "WARNING: Some mods and modpacks may require Java 8."
+    log "         Please use itzg/minecraft-server:java8"
+    log "**********************************************************************"
+    sleep 5
+  fi
 }
 
 function extract() {
@@ -199,7 +227,7 @@ function extract() {
     application/zip)
       unzip -q -d "${destDir}" "${src}"
       ;;
-    application/x-tar|application/gzip|application/x-bzip2|application/zstd)
+    application/x-tar|application/gzip|application/x-gzip|application/x-bzip2|application/zstd|application/x-zstd)
       tar -C "${destDir}" -xf "${src}"
       ;;
     *)
@@ -207,4 +235,25 @@ function extract() {
       return 1
       ;;
   esac
+}
+
+function getDistro() {
+  cat /etc/os-release | grep -E "^ID=" | cut -d= -f2 | sed -e 's/"//g'
+}
+
+function checkSum() {
+  local sum_file=${1?}
+
+  # Get distro
+  distro=$(getDistro)
+  
+  if [ "${distro}" == "debian" ] && sha1sum -c "${sum_file}" --status 2> /dev/null; then
+    return 0
+  elif [ "${distro}" == "ubuntu" ] && sha1sum -c "${sum_file}" --status 2> /dev/null; then
+    return 0
+  elif [ "${distro}" == "alpine" ] && sha1sum -c "${sum_file}" -s 2> /dev/null; then
+    return 0
+  else
+    return 1
+  fi
 }

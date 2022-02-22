@@ -1,12 +1,24 @@
 version: "3"
 
 services:
+  web:
+    image: nginx
+    volumes:
+      - ./web:/usr/share/nginx/html
   mc:
+    depends_on:
+      - web
     image: ${IMAGE_TO_TEST:-itzg/minecraft-server}
     environment:
       EULA: "true"
-      SETUP_ONLY: "TRUE"
-      GENERIC_PACKS: https://github.com/itzg/mc-image-helper/releases/download/v1.9.5/mc-image-helper-1.9.5.zip,/packs/testing.zip
+      SETUP_ONLY: "true"
+      GENERIC_PACKS: http://web/configs.zip,/packs/testing.zip
+      LOG_TIMESTAMP: "true"
+      # the following are only used to speed up test execution
+      TYPE: CUSTOM
+      CUSTOM_SERVER: /servers/fake.jar
+      VERSION: 1.18.1
     volumes:
       - ./packs:/packs
       - ./data:/data
+      - ./fake.jar:/servers/fake.jar

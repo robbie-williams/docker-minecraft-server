@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  mc:
+    image: ${IMAGE_TO_TEST:-itzg/minecraft-server}
+    environment:
+      EULA: "true"
+      SETUP_ONLY: "TRUE"
+      GENERIC_PACKS: testing
+      GENERIC_PACKS_PREFIX: /packs/
+      GENERIC_PACKS_SUFFIX: .zip
+    volumes:
+      - ./packs:/packs
+      - ./data:/data
