@@ -1,36 +1,3 @@
-<<<<<<< HEAD
-FROM eclipse-temurin:17-jdk
-
-LABEL org.opencontainers.image.authors="Geoff Bourne <itzgeoff@gmail.com>"
-
-ENV PORT ${PORT}
-
-RUN apt-get update \
-  && DEBIAN_FRONTEND=noninteractive \
-  apt-get install -y \
-  imagemagick \
-  file \
-  gosu \
-  sudo \
-  net-tools \
-  iputils-ping \
-  curl \
-  git \
-  jq \
-  dos2unix \
-  mysql-client \
-  tzdata \
-  rsync \
-  nano \
-  unzip \
-  zstd \
-  knockd \
-  ttf-dejavu \
-  && apt-get clean
-
-RUN addgroup --gid 1000 minecraft \
-  && adduser --system --shell /bin/false --uid 1000 --ingroup minecraft --home /data minecraft
-=======
 # syntax = docker/dockerfile:1.3
 
 ARG BASE_IMAGE=eclipse-temurin:17-jdk
@@ -44,7 +11,6 @@ RUN --mount=target=/build,source=build \
 
 RUN --mount=target=/build,source=build \
     REV=${BUILD_FILES_REV} /build/run.sh setup-user
->>>>>>> c50c9988fc90285a0c2c5739a6eeb8a0f494ca2a
 
 COPY --chmod=644 files/sudoers* /etc/sudoers.d
 
